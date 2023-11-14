@@ -228,7 +228,7 @@ class GiveWpBlockonomics
         extract($context);
         // Load the checkout template
         ob_start(); // Start buffering
-        include_once plugin_dir_path(__FILE__)."templates/" .$template;
+        include_once plugin_dir_path(__FILE__)."public/templates/" .$template;
         return ob_get_clean(); // Return the buffered content
     }
 

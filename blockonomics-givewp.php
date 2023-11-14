@@ -18,7 +18,7 @@ $plugin = plugin_basename(__FILE__);
 
 // Register the blockonomics gateway
 add_action('givewp_register_payment_gateway', static function ($paymentGatewayRegister) {
-    include_once 'class-blockonomics-gateway.php';
+    include_once 'includes/class-blockonomics-gateway.php';
     $paymentGatewayRegister->registerGateway(GiveWpBlockonomicsPaymentGateway::class);
 });
 register_activation_hook(__FILE__, 'givewp_blockonomics_activation_hook');
@@ -47,7 +47,7 @@ function givewp_blockonomics_handle_callback()
         $txid = isset($_GET['txid']) ? sanitize_text_field(wp_unslash($_GET['txid'])) : "";
         $rbf = isset($_GET['rbf']) ? wp_validate_boolean(intval(wp_unslash($_GET['rbf']))) : "";
 
-        include_once 'blockonomics.php';
+        include_once 'includes/blockonomics.php';
         $blockonomics = new GiveWpBlockonomics();
 
         if ($secret && $addr && isset($status) && $value && $txid) {
@@ -171,7 +171,7 @@ function givewp_blockonomics_add_donation_page_shortcode()
     $crypto = isset($_GET["crypto"]) ? sanitize_key($_GET['crypto']) : "";
     $select_crypto = isset($_GET["select_crypto"]) ? sanitize_text_field(wp_unslash($_GET['select_crypto'])) : "";
 
-    include_once 'blockonomics.php';
+    include_once 'includes/blockonomics.php';
     $blockonomics = new GiveWpBlockonomics();
 
     if ($crypto === "empty") {
@@ -186,15 +186,15 @@ function givewp_blockonomics_add_donation_page_shortcode()
 
 function givewp_blockonomics_register_stylesheets()
 {
-    wp_register_style('givewp-blockonomics-style', plugin_dir_url(__FILE__) . "css/order.css", '', get_plugin_data(__FILE__)['Version']);
+    wp_register_style('givewp-blockonomics-style', plugin_dir_url(__FILE__) . "public/css/order.css", '', get_plugin_data(__FILE__)['Version']);
 }
 
 function givewp_blockonomics_register_scripts()
 {
-    wp_register_script('givewp-blockonomics-reconnecting-websocket', plugins_url('js/vendors/reconnecting-websocket.min.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
-    wp_register_script('givewp-blockonomics-qrious', plugins_url('js/vendors/qrious.min.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
-    wp_register_script('givewp-blockonomics-copytoclipboard', plugins_url('js/vendors/copytoclipboard.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
-    wp_register_script('givewp-blockonomics-checkout', plugins_url('js/checkout.js#deferload', __FILE__), array('givewp-blockonomics-reconnecting-websocket', 'givewp-blockonomics-qrious','givewp-blockonomics-copytoclipboard'), get_plugin_data(__FILE__)['Version']);
+    wp_register_script('givewp-blockonomics-reconnecting-websocket', plugins_url('public/js/vendors/reconnecting-websocket.min.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
+    wp_register_script('givewp-blockonomics-qrious', plugins_url('public/js/vendors/qrious.min.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
+    wp_register_script('givewp-blockonomics-copytoclipboard', plugins_url('public/js/vendors/copytoclipboard.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
+    wp_register_script('givewp-blockonomics-checkout', plugins_url('public/js/checkout.js#deferload', __FILE__), array('givewp-blockonomics-reconnecting-websocket', 'givewp-blockonomics-qrious','givewp-blockonomics-copytoclipboard'), get_plugin_data(__FILE__)['Version']);
 }
 
 function givewp_blockonomics_ajax_handler()
@@ -202,7 +202,7 @@ function givewp_blockonomics_ajax_handler()
     $crypto = isset($_GET["crypto"]) ? sanitize_key($_GET['crypto']) : "";
     $get_amount = isset($_GET['get_amount']) ? sanitize_text_field(wp_unslash($_GET['get_amount'])) : "";
 
-    include_once 'blockonomics.php';
+    include_once 'includes/blockonomics.php';
     $blockonomics = new GiveWpBlockonomics();
 
     if ($get_amount && $crypto) {
