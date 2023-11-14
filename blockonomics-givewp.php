@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Blockonomics Gateway for GiveWP
- * Description: Blockonomics GiveWP payment gateway.
+ * Plugin Name: Bitcoin Donations - Blockonomics for GiveWP
+ * Description: Bitcoin Donations for GiveWP by Blockonomics.
  * Version: 0.1.1
  * Requires at least: 5.0
  * Requires PHP: 7.0
@@ -146,16 +146,12 @@ function givewp_blockonomics_plugin_add_settings_link($links)
 
 function givewp_blockonomics_add_donation_page_shortcode()
 {
-    // This is to make sure we only run the shortcode when executed to render the page.
-    // Because the shortcode can be run multiple times by other plugin like All in One SEO.
-    // Where it tries to build SEO content from the shortcode and this could lead to checkout page not loading correctly.
+    // Temp Fix for givewp referer check, which leads to blank checkout page during on-site redirect
     global $wp;
     $current_url = home_url(add_query_arg($_GET, $wp->request));
-
     $base = Give()->routeForm->getBase();
     $formName = get_post_field('post_name', Frontend::getFormId());
     $referer = trailingslashit(wp_get_referer()) ?: '';
-
     if (false !== strpos($referer, "/{$base}/{$formName}/")) {
         return '<a style="font-size: 0" id="link" href="' . $current_url . '" target="_parent"></a>
         <script>
@@ -163,6 +159,9 @@ function givewp_blockonomics_add_donation_page_shortcode()
         </script>';
     }
 
+    // This is to make sure we only run the shortcode when executed to render the page.
+    // Because the shortcode can be run multiple times by other plugin like All in One SEO.
+    // Where it tries to build SEO content from the shortcode and this could lead to checkout page not loading correctly.
     $currentFilter = current_filter();
     if ($currentFilter == 'wp_head') {
         return;
@@ -236,7 +235,6 @@ function givewp_blockonomics_register_payment_gateway_setting_fields($settings)
 {
     switch(give_get_current_setting_section()) {
         case 'blockonomics-settings':
-
             give_update_option('givewp_blockonomics_callback_url', givewp_blockonomics_get_callback_url());
 
             $settings = array(

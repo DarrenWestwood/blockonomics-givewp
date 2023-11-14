@@ -417,7 +417,7 @@ class GiveWpBlockonomics
         return FormUtils::getSuccessPageURL();
     }
 
-    // Redirect the user to the woocommerce finish order page
+    // Redirect the user to the givewp finish order page
     public function redirect_finish_order(){
         echo '<a style="font-size: 0" id="link" href="'.$this->get_received_url().'" target="_parent"></a>
         <script>
