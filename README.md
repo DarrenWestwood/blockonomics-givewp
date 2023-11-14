@@ -1,2 +1,1 @@
-# blockonomics-givewp
-Crypto Donations for GiveWP
+Add in the finished doc link here.
