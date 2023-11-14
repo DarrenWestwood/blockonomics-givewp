@@ -152,8 +152,8 @@ class GiveWpBlockonomics
     public function get_parameterized_url($type, $params = array())
     {
         if ($type === 'page') {
-            $page_id = get_option('givewp_blockonomics_donation_page_id');
-            $order_url = 0 < $page_id ? get_permalink( $page_id ) : '';
+            $page_id = give_get_option('givewp_blockonomics_donation_page_id');
+            $order_url = get_permalink( $page_id );
         }else{
             $order_url = admin_url('admin-ajax.php');
         }
@@ -279,7 +279,7 @@ class GiveWpBlockonomics
     }
 
     public function create_new_order($order_id, $crypto){
-        $responseObj = $this->new_address(get_option("givewp_blockonomics_callback_secret"), $crypto);
+        $responseObj = $this->new_address(give_get_option("givewp_blockonomics_callback_secret"), $crypto);
         if($responseObj->response_code != 200) {
             return array("error"=>$responseObj->response_message);
         }
@@ -516,7 +516,7 @@ class GiveWpBlockonomics
 
     // Check if the callback secret in the request matches
     public function check_callback_secret($secret){
-        $callback_secret = get_option("givewp_blockonomics_callback_secret");
+        $callback_secret = give_get_option("givewp_blockonomics_callback_secret");
         if ($callback_secret  && $callback_secret == $secret) {
             return true;
         }
@@ -610,7 +610,7 @@ class GiveWpBlockonomics
     {
         $encryption_algorithm = 'AES-128-CBC';
         $hashing_algorith = 'sha256';
-        $secret = get_option('givewp_blockonomics_callback_secret');;
+        $secret = give_get_option('givewp_blockonomics_callback_secret');;
         $key = hash($hashing_algorith, $secret, true);
         $iv = substr($secret, 0, 16);
 
@@ -635,7 +635,7 @@ class GiveWpBlockonomics
     {
         $encryption_algorithm = 'AES-128-CBC';
         $hashing_algorith = 'sha256';
-        $secret = get_option('givewp_blockonomics_callback_secret');
+        $secret = give_get_option('givewp_blockonomics_callback_secret');
         // prevent decrypt failing when $hash is not hex or has odd length
         if (strlen($hash) % 2 || !ctype_xdigit($hash)) {
             echo __("Error: Incorrect Hash. Hash cannot be validated.", 'blockonomics-bitcoin-payments');
