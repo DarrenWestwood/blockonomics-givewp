@@ -190,10 +190,6 @@ class GiveWpBlockonomics
         return false;
     }
 
-    public function is_partial_payments_active(){
-        return give_get_option('blockonomics_partial_payments', true);
-    }
-
     public function is_error_template($template_name) {
         if (strpos($template_name, 'error') === 0) {
             return true;
@@ -257,7 +253,7 @@ class GiveWpBlockonomics
                 exit();
             }
             $price = $responseObj->price;
-            $price = $price * 100/(100+give_get_option('blockonomics_margin', 0));
+            $price = $price;
         } else {
             $price = 1;
         }
@@ -385,7 +381,7 @@ class GiveWpBlockonomics
             $script = "const blockonomics_data = '" . json_encode( array (
                 'crypto' => $context['crypto'],
                 'crypto_address' => $context['order']['address'],
-                'time_period' => give_get_option('blockonomics_timeperiod', 10),
+                'time_period' => 10,
                 'finish_order_url' => $this->get_received_url(),
                 'get_order_amount_url' => $this->get_parameterized_url('api',array('get_amount'=>$order_hash, 'crypto'=>  $context['crypto']['code'])),
                 'payment_uri' => $context['payment_uri']
