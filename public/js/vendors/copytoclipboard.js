@@ -263,9 +263,11 @@ class CopyToClipboard {
   // Watches for any DOM changes which include the data-copy attribute
   const blockonomicsObserver = new MutationObserver((mutations) => {
     mutations.forEach(element => {
-      var found_elem = element.target.querySelector('[data-copy]')
-      if(found_elem){
-        copyToClipboard.processElement(found_elem)
+      var found_elems = element.target.querySelectorAll('[data-copy]')
+      if(found_elems){
+        for (let i = 0; i < found_elems.length; i++) {
+          copyToClipboard.processElement(found_elems[i])
+        }
       }
     })
   });
