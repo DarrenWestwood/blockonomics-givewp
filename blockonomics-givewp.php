@@ -176,7 +176,7 @@ function givewp_blockonomics_register_scripts()
     wp_register_script('givewp-blockonomics-reconnecting-websocket', plugins_url('public/js/vendors/reconnecting-websocket.min.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
     wp_register_script('givewp-blockonomics-qrious', plugins_url('public/js/vendors/qrious.min.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
     wp_register_script('givewp-blockonomics-copytoclipboard', plugins_url('public/js/vendors/copytoclipboard.js#deferload', __FILE__), array(), get_plugin_data(__FILE__)['Version']);
-    wp_register_script('givewp-blockonomics-checkout', plugins_url('public/js/checkout.js#deferload', __FILE__), array('givewp-blockonomics-reconnecting-websocket', 'givewp-blockonomics-qrious','givewp-blockonomics-copytoclipboard'), get_plugin_data(__FILE__)['Version']);
+    wp_register_script('givewp-blockonomics-checkout', plugins_url('public/js/checkout.js#deferload', __FILE__), array('givewp-blockonomics-reconnecting-websocket', 'givewp-blockonomics-qrious','givewp-blockonomics-copytoclipboard'), get_plugin_data(__FILE__)['Version'], array('in_footer' => true ));
 }
 
 function givewp_blockonomics_ajax_handler()
