@@ -15,6 +15,7 @@ use Give\Helpers\Form\Template\Utils\Frontend;
 global $blockonomics_db_version;
 $blockonomics_db_version = '1.0';
 $plugin = plugin_basename(__FILE__);
+define( 'BLOCKONOMICS_GIVEWP_PLUGIN_DIR', plugin_dir_path(__FILE__) );
 
 // Register the blockonomics gateway
 add_action('givewp_register_payment_gateway', static function ($paymentGatewayRegister) {
