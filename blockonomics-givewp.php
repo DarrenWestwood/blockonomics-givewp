@@ -24,9 +24,9 @@ add_action('givewp_register_payment_gateway', static function ($paymentGatewayRe
 });
 register_activation_hook(__FILE__, 'givewp_blockonomics_activation_hook');
 register_activation_hook(__FILE__, 'givewp_blockonomics_plugin_setup');
-register_deactivation_hook(__FILE__, 'givewp_blockonomics_uninstall_hook');
+register_deactivation_hook(__FILE__, 'givewp_blockonomics_deactivation_hook');
 add_action('plugins_loaded', 'givewp_blockonomics_update_db_check');
-add_action('init', 'givewp_blockonomics_handle_callback');
+add_action('rest_api_init', 'givewp_blockonomics_callback_url_endpoint');
 add_action('wp_enqueue_scripts', 'givewp_blockonomics_register_stylesheets');
 add_action('wp_enqueue_scripts', 'givewp_blockonomics_register_scripts');
 add_action('wp_ajax_nopriv_get_amount', 'givewp_blockonomics_ajax_handler');
@@ -35,29 +35,6 @@ add_shortcode('blockonomics_donation', 'givewp_blockonomics_add_donation_page_sh
 add_filter("plugin_action_links_$plugin", 'givewp_blockonomics_plugin_add_settings_link');
 add_filter('give_get_sections_gateways', 'blockonomics_for_give_register_payment_gateway_sections');
 add_filter('give_get_settings_gateways', 'givewp_blockonomics_register_payment_gateway_setting_fields');
-
-function givewp_blockonomics_handle_callback()
-{
-    $give_listener = isset($_GET["give-listener"]) ? sanitize_key($_GET['give-listener']) : "";
-
-    if($give_listener == 'blockonomics') {
-        $secret = isset($_GET['secret']) ? sanitize_text_field(wp_unslash($_GET['secret'])) : "";
-        $addr = isset($_GET['addr']) ? sanitize_text_field(wp_unslash($_GET['addr'])) : "";
-        $status = isset($_GET['status']) ? intval($_GET['status']) : "";
-        $value = isset($_GET['value']) ? absint($_GET['value']) : "";
-        $txid = isset($_GET['txid']) ? sanitize_text_field(wp_unslash($_GET['txid'])) : "";
-        $rbf = isset($_GET['rbf']) ? wp_validate_boolean(intval(wp_unslash($_GET['rbf']))) : "";
-
-        include_once 'includes/blockonomics.php';
-        $blockonomics = new GiveWpBlockonomics();
-
-        if ($secret && $addr && isset($status) && $value && $txid) {
-            $blockonomics->process_callback($secret, $addr, $status, $value, $txid, $rbf);
-        }
-
-        exit();
-    }
-}
 
 function givewp_blockonomics_create_table()
 {
@@ -130,12 +107,16 @@ function givewp_blockonomics_plugin_setup()
     givewp_blockonomics_generate_secret();
 }
 
-function givewp_blockonomics_uninstall_hook()
+function givewp_blockonomics_deactivation_hook()
 {
-    give_delete_option('givewp_blockonomics_callback_secret');
     // Remove the custom page and shortcode added for payment
     remove_shortcode('blockonomics_donation');
-    wp_trash_post(give_get_option('givewp_blockonomics_donation_page_id'));
+    wp_delete_post(give_get_option('givewp_blockonomics_donation_page_id'), true);
+    give_delete_option('givewp_blockonomics_donation_page_id');
+    give_delete_option('givewp_blockonomics_callback_secret');
+    give_delete_option('givewp_blockonomics_callback_url');
+    give_delete_option('givewp_blockonomics_api_key');
+    give_delete_option('givewp_blockonomics_btc');
 }
 
 function givewp_blockonomics_plugin_add_settings_link($links)
@@ -225,8 +206,7 @@ function givewp_blockonomics_generate_secret($force_generate = false)
 
 function givewp_blockonomics_get_callback_url()
 {
-    $callback_url = get_home_url();
-    $callback_url = add_query_arg('give-listener', 'blockonomics', $callback_url);
+    $callback_url = get_site_url() . "/wp-json/blockonomics-give/callback";
     $callback_secret = give_get_option('givewp_blockonomics_callback_secret');
     $callback_url = add_query_arg('secret', $callback_secret, $callback_url);
     return $callback_url;
@@ -277,4 +257,34 @@ function blockonomics_for_give_register_payment_gateway_sections($sections)
 {
     $sections['blockonomics-settings'] = __('Blockonomics', 'blockonomics-for-give');
     return $sections;
+}
+
+function givewp_blockonomics_callback_url_endpoint() {
+	register_rest_route(
+		'blockonomics-give',
+		'callback',
+		array(
+			'methods' => 'GET',
+			'callback' => 'givewp_blockonomics_handle_callback',
+            'permission_callback' => '__return_true'
+		)
+	);
+}
+
+function givewp_blockonomics_handle_callback($request_data) {
+	$secret = isset($_GET['secret']) ? sanitize_text_field(wp_unslash($_GET['secret'])) : "";
+    $addr = isset($_GET['addr']) ? sanitize_text_field(wp_unslash($_GET['addr'])) : "";
+    $status = isset($_GET['status']) ? intval($_GET['status']) : "";
+    $value = isset($_GET['value']) ? absint($_GET['value']) : "";
+    $txid = isset($_GET['txid']) ? sanitize_text_field(wp_unslash($_GET['txid'])) : "";
+    $rbf = isset($_GET['rbf']) ? wp_validate_boolean(intval(wp_unslash($_GET['rbf']))) : "";
+
+    include_once 'includes/blockonomics.php';
+    $blockonomics = new GiveWpBlockonomics();
+
+    if ($secret && $addr && isset($status) && $value && $txid) {
+        $blockonomics->process_callback($secret, $addr, $status, $value, $txid, $rbf);
+    }
+
+	die();
 }
