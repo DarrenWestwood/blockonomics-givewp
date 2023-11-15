@@ -181,14 +181,6 @@ class GiveWpBlockonomics
         }
         return $order_url;
     }
-    
-    // Check if a template is a nojs template
-    public function is_nojs_template($template_name){
-        if (strpos($template_name, 'nojs') === 0) {
-            return true;
-        }
-        return false;
-    }
 
     public function is_error_template($template_name) {
         if (strpos($template_name, 'error') === 0) {
@@ -259,19 +251,6 @@ class GiveWpBlockonomics
         }
         $order['expected_satoshi'] = intval(round(1.0e8*$order['expected_fiat']/$price));
         return $order;
-    }
-
-    // Save the new address to the WooCommerce order
-    public function record_address($order_id, $crypto, $address){
-        $addr_meta_key = 'blockonomics_payments_addresses';
-        $addr_meta_value = get_post_meta($order_id, $addr_meta_key);
-        if (empty($addr_meta_value)){ 
-            update_post_meta($order_id, $addr_meta_key, $address);
-        } 
-        // when address meta value is not empty and $address is not in it 
-        else if (strpos($addr_meta_value[0], $address) === false) {
-            update_post_meta($order_id, $addr_meta_key, $addr_meta_value[0]. ', '. $address);
-        }
     }
 
     public function create_new_order($order_id, $crypto){
@@ -476,7 +455,6 @@ class GiveWpBlockonomics
                 return $order;
             }
             $this->insert_order($order);
-            // $this->record_address($order_id, $crypto, $order['address']);
         }
         return $order;
     }
